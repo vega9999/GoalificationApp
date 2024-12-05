@@ -12,12 +12,24 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.goalification.ui.theme.GoalificationAppTheme
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -33,49 +47,128 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             GoalificationAppTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {
-                        CustomAppBar(onMenuClick = { /* Handle navigation */ })
-                    }
-                ) { innerPadding ->
-                    HomepageScreen(modifier = Modifier.padding(innerPadding))
-                }
+                MainScreen()
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomAppBar(onMenuClick: () -> Unit) {
-    Box(
+fun MainScreen() {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent()
+            }
+        },
+        drawerState = drawerState
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Goalification App") },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                scope.launch { drawerState.open() }
+                            }
+                        ) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu Icon")
+                        }
+                    }
+                )
+            },
+            content = { paddingValues ->
+                HomepageScreen(modifier = Modifier.padding(paddingValues))
+            }
+        )
+    }
+
+}
+
+@Composable
+fun DrawerContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(280.dp)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Goalification",
+            fontSize = 24.sp,
+            color = Color.Black,
+            modifier = Modifier
+                .padding(bottom = 24.dp)
+                .align(Alignment.Start),
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        DrawerMenuItem(
+            text = "Homepage",
+            iconRes = R.drawable.ic_home // Replace with your actual resource
+        )
+
+        DrawerMenuItem(
+            text = "Calendar",
+            iconRes = R.drawable.ic_calendar_black // Replace with your actual resource
+        )
+        DrawerMenuItem(
+            text = "Stats",
+            iconRes = R.drawable.ic_stats // Replace with your actual resource
+        )
+        DrawerMenuItem(
+            text = "Stats-Friends",
+            iconRes = R.drawable.ic_friends // Replace with your actual resource
+        )
+        DrawerMenuItem(
+            text = "Goalification",
+            iconRes = R.drawable.ic_goal // Replace with your actual resource
+        )
+        DrawerMenuItem(
+            text = "Work",
+            iconRes = R.drawable.ic_work // Replace with your actual resource
+        )
+        DrawerMenuItem(
+            text = "Freetime",
+            iconRes = R.drawable.ic_freetime // Replace with your actual resource
+        )
+    }
+}
+
+@Composable
+fun DrawerMenuItem(text: String, iconRes: Int) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .background(color = Color.LightGray)
+            .padding(vertical = 12.dp)
+            .wrapContentHeight(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp, top = 8.dp, end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onMenuClick,
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                    tint = Color.Black
-                )
-            }
-        }
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = text,
+            tint = Color.Black,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp)) // Space between icon and text
+        Text(
+            text = text,
+            fontSize = 18.sp,
+            color = Color.Black,
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomepageScreen(modifier: Modifier = Modifier) {
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -124,6 +217,8 @@ fun HomepageScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
         GoalsGrid()
     }
+
+
 }
 
 @Composable
@@ -172,7 +267,11 @@ fun ChallengeCard(title: String, subtitle: String, progress: String) {
         )
         Column {
             Text(text = title, style = MaterialTheme.typography.bodyMedium)
-            Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
         }
         Text(text = progress, style = MaterialTheme.typography.titleMedium)
     }
