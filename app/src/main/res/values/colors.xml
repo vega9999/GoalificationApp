@@ -7,4 +7,14 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="primary">#FFFFCC80</color>
+    <color name="secondary">#FFFFF59D</color>
+    <color name="accent">#FFFFFF</color>
+    <color name="primary_text">#FF000000</color>
+    <color name="secondary_text">#FF888888</color>
+    <color name="icons">#FF000000</color>
+    <color name="divider">#FFFFFF</color>
+    <color name="bg_color">#FFFFFFFF</color>
+    <color name="challenge_card_color">#FFCCCCCC</color>
 </resources>

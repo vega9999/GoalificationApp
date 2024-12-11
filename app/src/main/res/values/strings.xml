@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">GoalificationApp</string>
+    <string name="app_name">Goalification App</string>
+    <string name="home_page_menu_item">HomePage</string>
+    <string name="calendar_menu_item">Calendar</string>
+    <string name="stats_menu_item">Stats</string>
+    <string name="stats_friends_menu_item">Stats-Friends</string>
+    <string name="goalification_menu_item">Goalification</string>
+    <string name="work_menu_item">Work</string>
+    <string name="freetime_menu_item">Freetime</string>
+    <string name="work_label">Work</string>
+    <string name="freetime_label">Freetime</string>
+    <string name="challenges_label">Challenges</string>
+    <string name="notes_label">Notes</string>
+    <string name="goals_label">Goals</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.goalificationapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +13,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,15 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.goalification.ui.theme.GoalificationAppTheme
@@ -70,7 +69,7 @@ fun MainScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Goalification App") },
+                    title = { Text(text = stringResource(id = R.string.app_name)) },
                     navigationIcon = {
                         IconButton(
                             onClick = {
@@ -83,7 +82,10 @@ fun MainScreen() {
                 )
             },
             content = { paddingValues ->
-                HomepageScreen(modifier = Modifier.padding(paddingValues))
+                HomepageScreen(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                )
             }
         )
     }
@@ -95,47 +97,47 @@ fun DrawerContent() {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .width(280.dp)
-            .padding(16.dp)
+            .width(dimensionResource(id = R.dimen.navigation_drawer_width))
+            .padding(dimensionResource(id = R.dimen.margin_medium_2))
     ) {
         Text(
-            text = "Goalification",
-            fontSize = 24.sp,
+            text = stringResource(id = R.string.app_name),
+            fontSize = dimensionResource(id = R.dimen.text_heading_1x).value.sp,
             color = Color.Black,
             modifier = Modifier
-                .padding(bottom = 24.dp)
+                .padding(bottom = dimensionResource(id = R.dimen.margin_large))
                 .align(Alignment.Start),
             style = MaterialTheme.typography.titleLarge
         )
 
         DrawerMenuItem(
-            text = "Homepage",
-            iconRes = R.drawable.ic_home // Replace with your actual resource
+            text = stringResource(id = R.string.home_page_menu_item),
+            iconRes = R.drawable.ic_home
         )
 
         DrawerMenuItem(
-            text = "Calendar",
-            iconRes = R.drawable.ic_calendar_black // Replace with your actual resource
+            text = stringResource(id = R.string.calendar_menu_item),
+            iconRes = R.drawable.ic_calendar_black
         )
         DrawerMenuItem(
-            text = "Stats",
-            iconRes = R.drawable.ic_stats // Replace with your actual resource
+            text = stringResource(id = R.string.stats_menu_item),
+            iconRes = R.drawable.ic_stats
         )
         DrawerMenuItem(
-            text = "Stats-Friends",
-            iconRes = R.drawable.ic_friends // Replace with your actual resource
+            text = stringResource(id = R.string.stats_friends_menu_item),
+            iconRes = R.drawable.ic_friends
         )
         DrawerMenuItem(
-            text = "Goalification",
-            iconRes = R.drawable.ic_goal // Replace with your actual resource
+            text = stringResource(id = R.string.goalification_menu_item),
+            iconRes = R.drawable.ic_goal
         )
         DrawerMenuItem(
-            text = "Work",
-            iconRes = R.drawable.ic_work // Replace with your actual resource
+            text = stringResource(id = R.string.work_menu_item),
+            iconRes = R.drawable.ic_work
         )
         DrawerMenuItem(
-            text = "Freetime",
-            iconRes = R.drawable.ic_freetime // Replace with your actual resource
+            text = stringResource(id = R.string.freetime_menu_item),
+            iconRes = R.drawable.ic_freetime
         )
     }
 }
@@ -145,35 +147,35 @@ fun DrawerMenuItem(text: String, iconRes: Int) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp)
+            .padding(vertical = dimensionResource(id = R.dimen.drawer_menu_item_padding))
             .wrapContentHeight(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = text,
-            tint = Color.Black,
-            modifier = Modifier.size(24.dp)
+            tint = colorResource(id = R.color.icons),
+            modifier = Modifier.size(dimensionResource(id = R.dimen.margin_large))
         )
-        Spacer(modifier = Modifier.width(16.dp)) // Space between icon and text
+        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.margin_medium_2)))
         Text(
             text = text,
-            fontSize = 18.sp,
-            color = Color.Black,
+            fontSize = dimensionResource(id = R.dimen.text_regular_2x).value.sp,
+            color = colorResource(id = R.color.primary_text),
             style = MaterialTheme.typography.bodyMedium
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("ResourceAsColor")
 @Composable
 fun HomepageScreen(modifier: Modifier = Modifier) {
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
+            .background(colorResource(id = R.color.bg_color))
+            .padding(dimensionResource(id = R.dimen.margin_medium_2))
     ) {
         // Work and Freetime Section
         Row(
@@ -182,39 +184,39 @@ fun HomepageScreen(modifier: Modifier = Modifier) {
         ) {
             IconWithLabel(
                 iconRes = R.drawable.ic_work,
-                label = "Work",
-                backgroundColor = Color(0xFFFFCC80)
+                label = stringResource(id = R.string.work_label),
+                backgroundColor = colorResource(id = R.color.primary)
             )
             IconWithLabel(
                 iconRes = R.drawable.ic_freetime,
-                label = "Freetime",
-                backgroundColor = Color(0xFFFFF59D)
+                label = stringResource(id = R.string.freetime_label),
+                backgroundColor = colorResource(id = R.color.secondary)
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
         // Challenges Section
-        SectionTitle("Challenges")
-        Spacer(modifier = Modifier.height(8.dp))
+        SectionTitle(stringResource(id = R.string.challenges_label))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         ChallengeCard(
             title = "Write reports",
             subtitle = "Employer xxx",
             progress = "1/3"
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
         // Notes Section
-        SectionTitle("Notes")
-        Spacer(modifier = Modifier.height(8.dp))
+        SectionTitle(stringResource(id = R.string.notes_label))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         NoteCard("Last day before vacation")
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
         // Goals Section
-        SectionTitle("Goals")
-        Spacer(modifier = Modifier.height(8.dp))
+        SectionTitle(stringResource(id = R.string.goals_label))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         GoalsGrid()
     }
 
@@ -226,17 +228,17 @@ fun IconWithLabel(iconRes: Int, label: String, backgroundColor: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(dimensionResource(id = R.dimen.icon_with_label_box_size))
                 .background(backgroundColor, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = iconRes),
                 contentDescription = label,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
     }
 }
@@ -256,21 +258,24 @@ fun ChallengeCard(title: String, subtitle: String, progress: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray, RoundedCornerShape(8.dp))
-            .padding(16.dp),
+            .background(
+                colorResource(id = R.color.challenge_card_color),
+                RoundedCornerShape(dimensionResource(R.dimen.margin_medium))
+            )
+            .padding(dimensionResource(id = R.dimen.margin_medium_2)),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_calendar),
             contentDescription = "Note Icon",
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
         )
         Column {
             Text(text = title, style = MaterialTheme.typography.bodyMedium)
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
+                color = colorResource(id = R.color.secondary_text)
             )
         }
         Text(text = progress, style = MaterialTheme.typography.titleMedium)
@@ -282,52 +287,54 @@ fun NoteCard(note: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray, RoundedCornerShape(8.dp))
-            .padding(16.dp),
+            .background(
+                colorResource(id = R.color.challenge_card_color),
+                RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium))
+            )
+            .padding(dimensionResource(id = R.dimen.margin_medium_2)),
         horizontalArrangement = Arrangement.Start
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_note),
             contentDescription = "Note Icon",
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.margin_medium_2)))
         Text(text = note, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
+@SuppressLint("ResourceAsColor")
 @Composable
 fun GoalsGrid() {
     val goals = listOf(
         "reports writing 1/3",
         "Test",
-        "Test",
-        "Test",
-        "Test",
-        "Test",
-        "Test",
-        "Test",
-        "Test"
+        "+"
     )
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_medium)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium))
     ) {
         items(goals) { goal ->
             Box(
                 modifier = Modifier
-                    .size(100.dp)
-                    .background(color = Color(0xFFFFCC80), RoundedCornerShape(8.dp))
-                    .padding(8.dp),
+                    .size(dimensionResource(id = R.dimen.goals_grid_size))
+                    .background(
+                        color = colorResource(id = R.color.primary),
+                        RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium))
+                    )
+                    .padding(dimensionResource(id = R.dimen.margin_medium)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = goal,
                     style = MaterialTheme.typography.bodySmall,
+                    fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
                     textAlign = TextAlign.Center
                 )
             }
