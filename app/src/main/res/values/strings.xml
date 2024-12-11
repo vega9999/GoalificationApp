@@ -12,4 +12,6 @@
     <string name="challenges_label">Challenges</string>
     <string name="notes_label">Notes</string>
     <string name="goals_label">Goals</string>
+    <string name="daily_label">Daily</string>
+    <string name="weekly_label">Weekly</string>
 </resources>

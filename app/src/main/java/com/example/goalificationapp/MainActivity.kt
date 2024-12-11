@@ -1,16 +1,10 @@
 package com.example.goalificationapp
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -25,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +29,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.example.goalification.ui.theme.GoalificationAppTheme
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.example.goalificationapp.Screens.CalendarScreen
+import com.example.goalificationapp.Screens.HomepageScreen
 import kotlinx.coroutines.launch
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,11 +51,15 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val currentScreen = remember { mutableStateOf("Homepage") }
 
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
-                DrawerContent()
+                DrawerContent(onMenuItemClick = { selectedScreen ->
+                    currentScreen.value = selectedScreen
+                    scope.launch { drawerState.close() } // Close the drawer after selection
+                })
             }
         },
         drawerState = drawerState
@@ -82,10 +80,22 @@ fun MainScreen() {
                 )
             },
             content = { paddingValues ->
-                HomepageScreen(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                )
+                when (currentScreen.value) {
+                    "Homepage" -> HomepageScreen(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                    )
+
+                    "Calendar" -> CalendarScreen(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                    )
+
+                    else -> HomepageScreen(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                    )
+                }
             }
         )
     }
@@ -93,7 +103,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun DrawerContent() {
+fun DrawerContent(onMenuItemClick: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -112,43 +122,55 @@ fun DrawerContent() {
 
         DrawerMenuItem(
             text = stringResource(id = R.string.home_page_menu_item),
-            iconRes = R.drawable.ic_home
+            iconRes = R.drawable.ic_home,
+            onClick = { onMenuItemClick("Homepage") }
         )
 
         DrawerMenuItem(
             text = stringResource(id = R.string.calendar_menu_item),
-            iconRes = R.drawable.ic_calendar_black
+            iconRes = R.drawable.ic_calendar_black,
+            onClick = { onMenuItemClick("Calendar") }
         )
+
         DrawerMenuItem(
             text = stringResource(id = R.string.stats_menu_item),
-            iconRes = R.drawable.ic_stats
+            iconRes = R.drawable.ic_stats,
+            onClick = { onMenuItemClick("Stats") }
         )
+
         DrawerMenuItem(
             text = stringResource(id = R.string.stats_friends_menu_item),
-            iconRes = R.drawable.ic_friends
+            iconRes = R.drawable.ic_friends,
+            onClick = { onMenuItemClick("Friends") }
         )
         DrawerMenuItem(
             text = stringResource(id = R.string.goalification_menu_item),
-            iconRes = R.drawable.ic_goal
+            iconRes = R.drawable.ic_goal,
+            onClick = { onMenuItemClick("Goalification") }
         )
+
         DrawerMenuItem(
             text = stringResource(id = R.string.work_menu_item),
-            iconRes = R.drawable.ic_work
+            iconRes = R.drawable.ic_work,
+            onClick = { onMenuItemClick("Work") }
         )
+
         DrawerMenuItem(
             text = stringResource(id = R.string.freetime_menu_item),
-            iconRes = R.drawable.ic_freetime
+            iconRes = R.drawable.ic_freetime,
+            onClick = { onMenuItemClick("Freetime") }
         )
     }
 }
 
 @Composable
-fun DrawerMenuItem(text: String, iconRes: Int) {
+fun DrawerMenuItem(text: String, iconRes: Int, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = dimensionResource(id = R.dimen.drawer_menu_item_padding))
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -167,185 +189,3 @@ fun DrawerMenuItem(text: String, iconRes: Int) {
     }
 }
 
-@SuppressLint("ResourceAsColor")
-@Composable
-fun HomepageScreen(modifier: Modifier = Modifier) {
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.bg_color))
-            .padding(dimensionResource(id = R.dimen.margin_medium_2))
-    ) {
-        // Work and Freetime Section
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconWithLabel(
-                iconRes = R.drawable.ic_work,
-                label = stringResource(id = R.string.work_label),
-                backgroundColor = colorResource(id = R.color.primary)
-            )
-            IconWithLabel(
-                iconRes = R.drawable.ic_freetime,
-                label = stringResource(id = R.string.freetime_label),
-                backgroundColor = colorResource(id = R.color.secondary)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
-
-        // Challenges Section
-        SectionTitle(stringResource(id = R.string.challenges_label))
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
-        ChallengeCard(
-            title = "Write reports",
-            subtitle = "Employer xxx",
-            progress = "1/3"
-        )
-
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
-
-        // Notes Section
-        SectionTitle(stringResource(id = R.string.notes_label))
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
-        NoteCard("Last day before vacation")
-
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
-
-        // Goals Section
-        SectionTitle(stringResource(id = R.string.goals_label))
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
-        GoalsGrid()
-    }
-
-
-}
-
-@Composable
-fun IconWithLabel(iconRes: Int, label: String, backgroundColor: Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier
-                .size(dimensionResource(id = R.dimen.icon_with_label_box_size))
-                .background(backgroundColor, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = iconRes),
-                contentDescription = label,
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
-            )
-        }
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
-        Text(text = label, style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-@Composable
-fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleLarge,
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Start
-    )
-}
-
-@Composable
-fun ChallengeCard(title: String, subtitle: String, progress: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                colorResource(id = R.color.challenge_card_color),
-                RoundedCornerShape(dimensionResource(R.dimen.margin_medium))
-            )
-            .padding(dimensionResource(id = R.dimen.margin_medium_2)),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_calendar),
-            contentDescription = "Note Icon",
-            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
-        )
-        Column {
-            Text(text = title, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = colorResource(id = R.color.secondary_text)
-            )
-        }
-        Text(text = progress, style = MaterialTheme.typography.titleMedium)
-    }
-}
-
-@Composable
-fun NoteCard(note: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                colorResource(id = R.color.challenge_card_color),
-                RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium))
-            )
-            .padding(dimensionResource(id = R.dimen.margin_medium_2)),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_note),
-            contentDescription = "Note Icon",
-            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
-        )
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.margin_medium_2)))
-        Text(text = note, style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-@SuppressLint("ResourceAsColor")
-@Composable
-fun GoalsGrid() {
-    val goals = listOf(
-        "reports writing 1/3",
-        "Test",
-        "+"
-    )
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(dimensionResource(id = R.dimen.margin_medium)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium))
-    ) {
-        items(goals) { goal ->
-            Box(
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.goals_grid_size))
-                    .background(
-                        color = colorResource(id = R.color.primary),
-                        RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium))
-                    )
-                    .padding(dimensionResource(id = R.dimen.margin_medium)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = goal,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    GoalificationAppTheme {
-        HomepageScreen(modifier = Modifier.fillMaxSize())
-    }
-}
