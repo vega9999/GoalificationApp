@@ -1,6 +1,7 @@
 package com.example.goalificationapp.Screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -21,14 +22,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.goalificationapp.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import java.time.format.TextStyle
-import java.util.Locale
+import com.example.goalificationapp.R
 
 @SuppressLint("NewApi")
 @Composable
@@ -36,24 +35,28 @@ fun CalendarScreen(
     modifier: Modifier = Modifier
 ) {
     val currentDate = remember { mutableStateOf(LocalDate.now()) }
-    val daysInMonth = remember(currentDate.value) { generateDaysOfMonth(currentDate.value) }
-
     var selectedDay by remember { mutableStateOf(currentDate.value) }
-    val dailyTasks =
-        remember { mutableStateListOf("Answer emails", "Drink water", "Write reports") }
+
+    val currentWeek = remember(selectedDay) { generateWeekDays(selectedDay) }
+
+    val dailyTasks = remember { mutableStateListOf("Answer emails", "Drink water", "Write reports") }
     val weeklyTasks = remember { mutableStateListOf("Have meeting") }
 
     Column(modifier = Modifier.padding(16.dp)) {
         CalendarHeader(
             currentDate = currentDate.value,
-            onMonthChange = { newDate ->
-                currentDate.value = newDate
+            onWeekChange = { newDate ->
+                selectedDay = newDate
             }
         )
 
         LazyRow(modifier = Modifier.fillMaxWidth()) {
-            items(daysInMonth) { day ->
-                DayItem(day = day, isSelected = day == selectedDay) {
+            items(currentWeek) { day ->
+                DayItem(
+                    day = day,
+                    isSelected = day == selectedDay,
+                    isToday = day == LocalDate.now()
+                ) {
                     selectedDay = day
                 }
             }
@@ -81,9 +84,9 @@ fun CalendarScreen(
 
 @SuppressLint("NewApi")
 @Composable
-fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
-    val currentMonth = currentDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-    val currentYear = currentDate.year
+fun CalendarHeader(currentDate: LocalDate, onWeekChange: (LocalDate) -> Unit) {
+    val formatter = java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy")
+    val currentMonthYear = currentDate.format(formatter)
 
     Row(
         modifier = Modifier
@@ -92,23 +95,23 @@ fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(onClick = { onMonthChange(currentDate.minusMonths(1)) }) {
+        IconButton(onClick = { onWeekChange(currentDate.minusWeeks(1)) }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_left),
-                contentDescription = "Previous Month"
+                contentDescription = "Previous Week"
             )
         }
 
         Text(
-            text = "$currentMonth $currentYear",
+            text = currentMonthYear,
             fontSize = dimensionResource(id = R.dimen.text_regular_3x).value.sp,
             color = colorResource(id = R.color.primary_text)
         )
 
-        IconButton(onClick = { onMonthChange(currentDate.plusMonths(1)) }) {
+        IconButton(onClick = { onWeekChange(currentDate.plusWeeks(1)) }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = "Next Month"
+                contentDescription = "Next Week"
             )
         }
     }
@@ -119,7 +122,7 @@ fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val daysOfWeek = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
+        val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         daysOfWeek.forEach { day ->
             Text(
                 text = day,
@@ -132,18 +135,28 @@ fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
     }
 }
 
-
 @SuppressLint("NewApi")
 @Composable
-fun DayItem(day: LocalDate, isSelected: Boolean, onClick: () -> Unit) {
-    Text(
-        text = day.dayOfMonth.toString(),
-        fontSize = dimensionResource(id = R.dimen.text_regular_2x).value.sp,
-        color = if (isSelected) Color.Blue else Color.Black,
+fun DayItem(day: LocalDate, isSelected: Boolean, isToday: Boolean, onClick: () -> Unit) {
+    val backgroundColor = when {
+        isSelected -> Color.Blue
+        isToday -> Color.LightGray
+        else -> Color.Transparent
+    }
+
+    Box(
         modifier = Modifier
             .padding(horizontal = dimensionResource(id = R.dimen.margin_medium))
             .clickable(onClick = onClick)
-    )
+            .background(backgroundColor)
+            .padding(8.dp)
+    ) {
+        Text(
+            text = day.dayOfMonth.toString(),
+            fontSize = dimensionResource(id = R.dimen.text_regular_2x).value.sp,
+            color = if (isSelected) Color.White else Color.Black
+        )
+    }
 }
 
 @Composable
@@ -169,10 +182,9 @@ fun TaskList(tasks: List<String>, type: String) {
 }
 
 @SuppressLint("NewApi")
-fun generateDaysOfMonth(date: LocalDate): List<LocalDate> {
-    val start = date.withDayOfMonth(1)
-    val end = date.withDayOfMonth(date.lengthOfMonth())
-    return (0 until end.dayOfMonth).map { start.plusDays(it.toLong()) }
+fun generateWeekDays(date: LocalDate): List<LocalDate> {
+    val startOfWeek = date.with(java.time.DayOfWeek.MONDAY)
+    return (0..6).map { startOfWeek.plusDays(it.toLong()) }
 }
 
 @Preview(showBackground = true)

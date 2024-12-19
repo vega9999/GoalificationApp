@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,10 +32,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import com.example.goalification.ui.theme.GoalificationAppTheme
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import com.example.goalificationapp.Screens.CalendarScreen
 import com.example.goalificationapp.Screens.HomepageScreen
+import com.example.goalificationapp.Screens.LoginScreen
+import com.example.goalificationapp.ui.theme.LoginViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -48,62 +55,77 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentScreen = remember { mutableStateOf("Homepage") }
+    val username = viewModel.username.collectAsState(initial = null)
+    val isLoggedIn = viewModel.isLoggedIn.collectAsState(initial = false)
 
-    ModalNavigationDrawer(
-        drawerContent = {
-            ModalDrawerSheet {
-                DrawerContent(onMenuItemClick = { selectedScreen ->
-                    currentScreen.value = selectedScreen
-                    scope.launch { drawerState.close() } // Close the drawer after selection
-                })
-            }
-        },
-        drawerState = drawerState
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = stringResource(id = R.string.app_name)) },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                scope.launch { drawerState.open() }
-                            }
-                        ) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu Icon")
+    if (!isLoggedIn.value) {
+        LoginScreen(
+            viewModel = viewModel
+        )
+    } else {
+        ModalNavigationDrawer(
+            drawerContent = {
+                ModalDrawerSheet {
+                    DrawerContent(
+                        username = username.value ?: "Guest",
+                        onMenuItemClick = { selectedScreen ->
+                            currentScreen.value = selectedScreen
+                            scope.launch { drawerState.close() }
+                        },
+                        onLogoutClick = {
+                            viewModel.logout()
                         }
-                    }
-                )
-            },
-            content = { paddingValues ->
-                when (currentScreen.value) {
-                    "Homepage" -> HomepageScreen(
-                        modifier = Modifier
-                            .padding(paddingValues)
-                    )
-
-                    "Calendar" -> CalendarScreen(
-                        modifier = Modifier
-                            .padding(paddingValues)
-                    )
-
-                    else -> HomepageScreen(
-                        modifier = Modifier
-                            .padding(paddingValues)
                     )
                 }
-            }
-        )
-    }
+            },
+            drawerState = drawerState
+        ) {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text(text = stringResource(id = R.string.app_name)) },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    scope.launch { drawerState.open() }
+                                }
+                            ) {
+                                Icon(Icons.Default.Menu, contentDescription = "Menu Icon")
+                            }
+                        }
+                    )
+                },
+                content = { paddingValues ->
+                    when (currentScreen.value) {
+                        "Homepage" -> HomepageScreen(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                        )
 
+                        "Calendar" -> CalendarScreen(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                        )
+
+                        else -> HomepageScreen(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                        )
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
-fun DrawerContent(onMenuItemClick: (String) -> Unit) {
+fun DrawerContent(onMenuItemClick: (String) -> Unit, username: String, onLogoutClick: () -> Unit) {
+    val isBoy = remember { mutableStateOf(true) }
+
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -119,6 +141,34 @@ fun DrawerContent(onMenuItemClick: (String) -> Unit) {
                 .align(Alignment.Start),
             style = MaterialTheme.typography.titleLarge
         )
+
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_small)))
+
+        Icon(
+            painter = painterResource(id = if (isBoy.value) R.drawable.ic_boy else R.drawable.ic_girl),
+            contentDescription = "Avatar",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(80.dp)
+                .padding(8.dp)
+                .clickable {
+                    isBoy.value = !isBoy.value
+                }
+        )
+
+        Text(
+            text = "Welcome back",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+        Text(
+            text = username,
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
         DrawerMenuItem(
             text = stringResource(id = R.string.home_page_menu_item),
@@ -160,8 +210,20 @@ fun DrawerContent(onMenuItemClick: (String) -> Unit) {
             iconRes = R.drawable.ic_freetime,
             onClick = { onMenuItemClick("Freetime") }
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onLogoutClick,
+            modifier = Modifier.align(Alignment.Start),
+            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
+        ) {
+            Text(text = "Logout", color = Color.Black)
+        }
+
     }
 }
+
 
 @Composable
 fun DrawerMenuItem(text: String, iconRes: Int, onClick: () -> Unit) {
