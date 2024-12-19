@@ -53,6 +53,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
     implementation("androidx.compose.material3:material3:1.1.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.4.4")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
