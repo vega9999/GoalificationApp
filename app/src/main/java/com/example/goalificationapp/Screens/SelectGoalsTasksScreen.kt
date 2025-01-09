@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,7 +58,7 @@ fun SelectGoalsTasksScreen(modifier: Modifier) {
     var selectedGoal by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF7F7F7))
             .padding(16.dp),
@@ -105,9 +105,13 @@ fun SelectGoalsTasksScreen(modifier: Modifier) {
 @Composable
 fun TaskItem(name: String, isSelected: Boolean, onSelect: () -> Unit) {
     Card(
-        backgroundColor = if (isSelected) Color(0xFFFFF9C4) else Color.White,
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(0xFFFFF9C4) else Color.White,
+        ),
         shape = RoundedCornerShape(12.dp),
-        elevation = 4.dp,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
