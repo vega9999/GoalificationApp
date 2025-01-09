@@ -28,10 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen() {
+fun StatsScreen(modifier: Modifier = Modifier) {
     val activity1Description = remember { mutableStateOf("1x write report") }
     val activity2Description = remember { mutableStateOf("1x meeting") }
     val selectedTab = remember { mutableStateOf("Week") }

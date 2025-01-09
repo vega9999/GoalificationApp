@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
 import androidx.compose.material.Card
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 
 @Composable
 fun SelectGoalsTasksScreen() {
@@ -126,5 +127,6 @@ fun TaskItem(name: String, isSelected: Boolean, onSelect: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewSelectGoalsTasksScreen() {
-    SelectGoalsTasksScreen()
+    SelectGoalsTasksScreen(
+    )
 }

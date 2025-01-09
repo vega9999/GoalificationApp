@@ -40,6 +40,7 @@ import com.example.goalificationapp.Screens.CalendarScreen
 import com.example.goalificationapp.Screens.HomepageScreen
 import com.example.goalificationapp.Screens.LoginScreen
 import com.example.goalificationapp.ui.theme.LoginViewModel
+import com.example.stats.StatsScreen
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -107,6 +108,10 @@ fun MainScreen(viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.
                         )
 
                         "Calendar" -> CalendarScreen(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                        )
+                        "Stats" -> StatsScreen(
                             modifier = Modifier
                                 .padding(paddingValues)
                         )

@@ -42,6 +42,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.compose.ui.unit.dp
+
 
 @SuppressLint("ResourceAsColor")
 @Composable
@@ -217,10 +219,13 @@ fun GoalsGrid(navController: NavController) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     GoalificationAppTheme {
-        HomepageScreen(modifier = Modifier.fillMaxSize())
+        HomepageScreen(
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }

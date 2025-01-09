@@ -28,6 +28,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -199,6 +200,8 @@ fun generateDaysOfMonth(date: LocalDate): List<LocalDate> {
 @Composable
 fun CalendarScreenPreview() {
     MaterialTheme {
-        CalendarScreen()
+        CalendarScreen(
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
