@@ -1,3 +1,4 @@
+
 package com.example.goalificationapp.Screens
 
 import android.annotation.SuppressLint
@@ -29,6 +30,9 @@ import com.example.goalificationapp.R
 @SuppressLint("ResourceAsColor")
 @Composable
 fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) {
+    var selectedTask by remember { mutableStateOf("") }
+    var selectedGoal by remember { mutableStateOf("") }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -75,7 +79,15 @@ fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) 
         // Goals Section
         SectionTitle(stringResource(id = R.string.goals_label))
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
-        GoalsGrid(navController = navController)
+        GoalsGrid(
+            navController = navController,
+            selectedTask = selectedTask,
+            selectedGoal = selectedGoal,
+            onSelectionComplete = { task, goal ->
+                selectedTask = task
+                selectedGoal = goal
+            }
+        )
     }
 }
 
@@ -161,7 +173,12 @@ fun NoteCard(note: String) {
 }
 
 @Composable
-fun GoalsGrid(navController: NavController) {
+fun GoalsGrid(
+    navController: NavController,
+    selectedTask: String,
+    selectedGoal: String,
+    onSelectionComplete: (String, String) -> Unit
+) {
     val goals = listOf("+", "+", "+")
 
     val buttonBackgroundColor = colorResource(id = R.color.primary)
@@ -174,24 +191,58 @@ fun GoalsGrid(navController: NavController) {
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium))
     ) {
         items(goals) { goal ->
-            Button(
-                onClick = {
-                    navController.navigate("selectGoalsTasksScreen")
-                },
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.goals_grid_size))
-                    .padding(dimensionResource(id = R.dimen.margin_medium)),
-                shape = RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium)),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonBackgroundColor
-                )
-            ) {
-                Text(
-                    text = goal,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
-                    textAlign = TextAlign.Center
-                )
+            if (selectedTask.isNotEmpty() && selectedGoal.isNotEmpty()) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = buttonBackgroundColor,
+                    ),
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium)),
+                    modifier = Modifier
+                        .size(dimensionResource(id = R.dimen.goals_grid_size))
+                        .padding(dimensionResource(id = R.dimen.margin_medium))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Task: $selectedTask",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Goal: $selectedGoal",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontSize = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            } else {
+                Button(
+                    onClick = {
+                        navController.navigate("selectGoalsTasksScreen")
+                    },
+                    modifier = Modifier
+                        .size(dimensionResource(id = R.dimen.goals_grid_size))
+                        .padding(dimensionResource(id = R.dimen.margin_medium)),
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = buttonBackgroundColor
+                    )
+                ) {
+                    Text(
+                        text = goal,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }

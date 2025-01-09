@@ -112,7 +112,8 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                         }
                         composable("selectGoalsTasksScreen") {
                             SelectGoalsTasksScreen(
-                                modifier = Modifier.padding(paddingValues)
+                                modifier = Modifier.padding(paddingValues),
+                                navController = rememberNavController()
                             )
                         }
                     }

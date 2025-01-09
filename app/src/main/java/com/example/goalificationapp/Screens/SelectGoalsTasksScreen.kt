@@ -1,3 +1,4 @@
+
 package com.example.goalificationapp.Screens
 
 import androidx.compose.foundation.background
@@ -15,9 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun SelectGoalsTasksScreen(modifier: Modifier) {
+fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
     val tasks = listOf(
         "Müllsammelaktion in Parks organisieren",
         "Gemeinschaftsgarten pflegen",
@@ -99,6 +102,25 @@ fun SelectGoalsTasksScreen(modifier: Modifier) {
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (selectedTask.isNotEmpty() && selectedGoal.isNotEmpty()) {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selectedTask", selectedTask)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selectedGoal", selectedGoal)
+                    navController.popBackStack()
+                }
+            },
+            enabled = selectedTask.isNotEmpty() && selectedGoal.isNotEmpty()
+        ) {
+            Text("Confirm Selection")
+        }
     }
 }
 
@@ -130,5 +152,6 @@ fun TaskItem(name: String, isSelected: Boolean, onSelect: () -> Unit) {
 fun PreviewSelectGoalsTasksScreen() {
     SelectGoalsTasksScreen(
         modifier = Modifier.fillMaxSize(),
+        navController = rememberNavController()
     )
 }
