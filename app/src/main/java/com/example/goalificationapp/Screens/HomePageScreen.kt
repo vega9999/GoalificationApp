@@ -35,10 +35,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.goalification.ui.theme.GoalificationAppTheme
 import com.example.goalificationapp.R
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavHost
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 
 @SuppressLint("ResourceAsColor")
 @Composable
 fun HomepageScreen(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
 
     Column(
         modifier = modifier
@@ -86,11 +94,10 @@ fun HomepageScreen(modifier: Modifier = Modifier) {
         // Goals Section
         SectionTitle(stringResource(id = R.string.goals_label))
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
-        GoalsGrid()
+        GoalsGrid(navController = navController)
     }
-
-
 }
+
 
 @Composable
 fun IconWithLabel(iconRes: Int, label: String, backgroundColor: Color) {
@@ -173,14 +180,11 @@ fun NoteCard(note: String) {
     }
 }
 
-@SuppressLint("ResourceAsColor")
 @Composable
-fun GoalsGrid() {
-    val goals = listOf(
-        "reports writing 1/3",
-        "Test",
-        "+"
-    )
+fun GoalsGrid(navController: NavController) {
+    val goals = listOf("+", "+", "+")
+
+    val buttonBackgroundColor = colorResource(id = R.color.primary)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -190,15 +194,17 @@ fun GoalsGrid() {
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium))
     ) {
         items(goals) { goal ->
-            Box(
+            Button(
+                onClick = {
+                    navController.navigate("selectGoalsTasksScreen")
+                },
                 modifier = Modifier
                     .size(dimensionResource(id = R.dimen.goals_grid_size))
-                    .background(
-                        color = colorResource(id = R.color.primary),
-                        RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium))
-                    )
                     .padding(dimensionResource(id = R.dimen.margin_medium)),
-                contentAlignment = Alignment.Center
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.margin_medium)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonBackgroundColor
+                )
             ) {
                 Text(
                     text = goal,
