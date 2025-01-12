@@ -1,4 +1,3 @@
-
 package com.example.goalificationapp
 
 import android.os.Bundle
@@ -33,6 +32,8 @@ import com.example.goalificationapp.Screens.SelectGoalsTasksScreen
 import com.example.goalificationapp.ui.theme.LoginViewModel
 import com.example.stats.StatsScreen
 import kotlinx.coroutines.launch
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,12 +115,18 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                                 modifier = Modifier.padding(paddingValues)
                             )
                         }
-                        composable("SelectGoalsTasksScreen") {
+                        composable(
+                            route = "SelectGoalsTasksScreen/{buttonIndex}",
+                            arguments = listOf(navArgument("buttonIndex") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val buttonIndex = backStackEntry.arguments?.getInt("buttonIndex") ?: 0
                             SelectGoalsTasksScreen(
                                 modifier = Modifier.padding(paddingValues),
-                                navController = navController
+                                navController = navController,
+                                buttonIndex = buttonIndex
                             )
                         }
+
                     }
                 }
             )

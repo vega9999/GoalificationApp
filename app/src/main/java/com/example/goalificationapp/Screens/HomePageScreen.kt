@@ -1,4 +1,3 @@
-
 package com.example.goalificationapp.Screens
 
 import android.annotation.SuppressLint
@@ -23,21 +22,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.goalificationapp.R
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+class HomepageViewModel : ViewModel() {
+    private val _selectedItems = mutableStateListOf<String>("", "", "")
+    val selectedItems: List<String> = _selectedItems
+
+    private val _isGoals = mutableStateListOf<Boolean>(false, false, false)
+    val isGoals: List<Boolean> = _isGoals
+
+    fun updateItem(index: Int, item: String, isGoal: Boolean) {
+        _selectedItems[index] = item
+        _isGoals[index] = isGoal
+    }
+}
 
 @SuppressLint("ResourceAsColor")
 @Composable
-fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) {
-    var selectedItems by remember { mutableStateOf(List(3) { "" }) }
-    var isGoals by remember { mutableStateOf(List(3) { false }) }
+fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: HomepageViewModel = viewModel()) {
+    val selectedItems by remember { mutableStateOf(viewModel.selectedItems) }
+    val isGoals by remember { mutableStateOf(viewModel.isGoals) }
 
     LaunchedEffect(navController) {
         navController.currentBackStackEntry?.savedStateHandle?.apply {
             getLiveData<String>("selectedItem").observe(navController.currentBackStackEntry!!) { item ->
-                getLiveData<Boolean>("isGoal").observe(navController.currentBackStackEntry!!) { isGoal ->
-                    val index = selectedItems.indexOfFirst { it.isEmpty() }
-                    if (index != -1 && item != null && isGoal != null) {
-                        selectedItems = selectedItems.toMutableList().apply { this[index] = item }
-                        isGoals = isGoals.toMutableList().apply { this[index] = isGoal }
+                getLiveData<Int>("buttonIndex").observe(navController.currentBackStackEntry!!) { index ->
+                    getLiveData<Boolean>("isGoal").observe(navController.currentBackStackEntry!!) { isGoal ->
+                        if (item != null && index != null && isGoal != null) {
+                            viewModel.updateItem(index, item, isGoal)
+                        }
                     }
                 }
             }
@@ -226,7 +240,7 @@ fun GoalsGrid(
             } else {
                 Button(
                     onClick = {
-                        navController.navigate("selectGoalsTasksScreen")
+                        navController.navigate("selectGoalsTasksScreen/$index")
                     },
                     modifier = Modifier
                         .size(dimensionResource(id = R.dimen.goals_grid_size))

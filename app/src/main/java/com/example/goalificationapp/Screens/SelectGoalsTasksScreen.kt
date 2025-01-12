@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
+fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController, buttonIndex: Int) {
     val tasks = listOf(
         "Müllsammelaktion in Parks organisieren",
         "Gemeinschaftsgarten pflegen",
@@ -96,6 +96,9 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("isGoal", isGoal)
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("buttonIndex", buttonIndex)
                     navController.popBackStack()
                 }
             },
