@@ -1,4 +1,3 @@
-
 package com.example.goalificationapp.Screens
 
 import androidx.compose.foundation.background
@@ -15,9 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
@@ -26,17 +23,7 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
         "Gemeinschaftsgarten pflegen",
         "Blutspendeveranstaltung unterstützen",
         "Suppenküche für Bedürftige betreuen",
-        "Bäume pflanzen für ein Umweltprojekt",
-        "Tiere in einem Tierheim versorgen",
-        "Sportveranstaltung für Kinder organisieren",
-        "Mentoring für Jugendliche übernehmen",
-        "Senioren im Umgang mit Technik helfen",
-        "Sprachkurse für Flüchtlinge anbieten",
-        "Barrierefreie Zugänge verbessern helfen",
-        "Bücher in einer Bibliothek sortieren",
-        "Spielnachmittage für Kinder im Krankenhaus organisieren",
-        "Fundraising-Veranstaltung planen",
-        "Workshops für gesunde Ernährung halten"
+        "Bäume pflanzen für ein Umweltprojekt"
     )
 
     val goals = listOf(
@@ -44,21 +31,11 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
         "An 5 verschiedenen Projekten teilnehmen",
         "100 kg Müll sammeln und recyceln",
         "20 Bäume in einem Monat pflanzen",
-        "5 neue Freiwillige für das Projekt gewinnen",
-        "Mindestens 50 Mahlzeiten verteilen",
-        "100 Bücher in einer Bibliothek sortieren",
-        "15 Senioren beim Umgang mit Technik helfen",
-        "3 erfolgreiche Workshops organisieren",
-        "Mindestens 3 Gemeinschaftsveranstaltungen leiten",
-        "10 Tiere in einem Monat betreuen",
-        "2 Mentoring-Sitzungen pro Woche anbieten",
-        "5 Flüchtlingen bei der Integration helfen",
-        "Mindestens 20 Kinder bei Veranstaltungen betreuen",
-        "3 Blutspendeaktionen unterstützen"
+        "5 neue Freiwillige für das Projekt gewinnen"
     )
 
-    var selectedTask by remember { mutableStateOf("") }
-    var selectedGoal by remember { mutableStateOf("") }
+    var selectedItem by remember { mutableStateOf("") }
+    var isGoal by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -68,37 +45,42 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Select Your Task",
+            text = "Wähle eine Aufgabe oder ein Ziel",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
+        Text(
+            text = "Aufgaben",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+        )
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
             items(tasks) { task ->
-                TaskItem(task, selectedTask == task) {
-                    selectedTask = task
+                ItemCard(task, selectedItem == task && !isGoal) {
+                    selectedItem = task
+                    isGoal = false
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         Text(
-            text = "Select Your Goal",
-            fontSize = 24.sp,
+            text = "Ziele",
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
         )
-
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
             items(goals) { goal ->
-                TaskItem(goal, selectedGoal == goal) {
-                    selectedGoal = goal
+                ItemCard(goal, selectedItem == goal && isGoal) {
+                    selectedItem = goal
+                    isGoal = true
                 }
             }
         }
@@ -107,25 +89,25 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController) {
 
         Button(
             onClick = {
-                if (selectedTask.isNotEmpty() && selectedGoal.isNotEmpty()) {
+                if (selectedItem.isNotEmpty()) {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
-                        ?.set("selectedTask", selectedTask)
+                        ?.set("selectedItem", selectedItem)
                     navController.previousBackStackEntry
                         ?.savedStateHandle
-                        ?.set("selectedGoal", selectedGoal)
+                        ?.set("isGoal", isGoal)
                     navController.popBackStack()
                 }
             },
-            enabled = selectedTask.isNotEmpty() && selectedGoal.isNotEmpty()
+            enabled = selectedItem.isNotEmpty()
         ) {
-            Text("Confirm Selection")
+            Text("Auswahl bestätigen")
         }
     }
 }
 
 @Composable
-fun TaskItem(name: String, isSelected: Boolean, onSelect: () -> Unit) {
+fun ItemCard(name: String, isSelected: Boolean, onSelect: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) Color(0xFFFFF9C4) else Color.White,
@@ -145,13 +127,4 @@ fun TaskItem(name: String, isSelected: Boolean, onSelect: () -> Unit) {
             modifier = Modifier.padding(16.dp)
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSelectGoalsTasksScreen() {
-    SelectGoalsTasksScreen(
-        modifier = Modifier.fillMaxSize(),
-        navController = rememberNavController()
-    )
 }

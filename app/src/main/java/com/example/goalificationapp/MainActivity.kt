@@ -1,3 +1,4 @@
+
 package com.example.goalificationapp
 
 import android.os.Bundle
@@ -64,7 +65,10 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                         username = username.value ?: "Guest",
                         onMenuItemClick = { selectedScreen ->
                             currentScreen.value = selectedScreen
-                            scope.launch { drawerState.close() }
+                            scope.launch {
+                                drawerState.close()
+                                navController.navigate(selectedScreen)
+                            }
                         },
                         onLogoutClick = {
                             viewModel.logout()
@@ -92,28 +96,28 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                 content = { paddingValues ->
                     NavHost(
                         navController = navController,
-                        startDestination = "homepage"
+                        startDestination = "Homepage"
                     ) {
-                        composable("homepage") {
+                        composable("Homepage") {
                             HomepageScreen(
                                 modifier = Modifier.padding(paddingValues),
                                 navController = navController
                             )
                         }
-                        composable("calendar") {
+                        composable("Calendar") {
                             CalendarScreen(
                                 modifier = Modifier.padding(paddingValues)
                             )
                         }
-                        composable("stats") {
+                        composable("Stats") {
                             StatsScreen(
                                 modifier = Modifier.padding(paddingValues)
                             )
                         }
-                        composable("selectGoalsTasksScreen") {
+                        composable("SelectGoalsTasksScreen") {
                             SelectGoalsTasksScreen(
                                 modifier = Modifier.padding(paddingValues),
-                                navController = rememberNavController()
+                                navController = navController
                             )
                         }
                     }

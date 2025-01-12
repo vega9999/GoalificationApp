@@ -19,19 +19,30 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.goalification.ui.theme.GoalificationAppTheme
 import com.example.goalificationapp.R
 
 @SuppressLint("ResourceAsColor")
 @Composable
 fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) {
-    var selectedTask by remember { mutableStateOf("") }
-    var selectedGoal by remember { mutableStateOf("") }
+    var selectedItems by remember { mutableStateOf(List(3) { "" }) }
+    var isGoals by remember { mutableStateOf(List(3) { false }) }
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntry?.savedStateHandle?.apply {
+            getLiveData<String>("selectedItem").observe(navController.currentBackStackEntry!!) { item ->
+                getLiveData<Boolean>("isGoal").observe(navController.currentBackStackEntry!!) { isGoal ->
+                    val index = selectedItems.indexOfFirst { it.isEmpty() }
+                    if (index != -1 && item != null && isGoal != null) {
+                        selectedItems = selectedItems.toMutableList().apply { this[index] = item }
+                        isGoals = isGoals.toMutableList().apply { this[index] = isGoal }
+                    }
+                }
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -39,7 +50,6 @@ fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) 
             .background(colorResource(id = R.color.bg_color))
             .padding(dimensionResource(id = R.dimen.margin_medium_2))
     ) {
-        // Work and Freetime Section
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -58,7 +68,6 @@ fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) 
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
-        // Challenges Section
         SectionTitle(stringResource(id = R.string.challenges_label))
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         ChallengeCard(
@@ -69,24 +78,18 @@ fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController) 
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
-        // Notes Section
         SectionTitle(stringResource(id = R.string.notes_label))
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         NoteCard("Last day before vacation")
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
 
-        // Goals Section
         SectionTitle(stringResource(id = R.string.goals_label))
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_medium)))
         GoalsGrid(
             navController = navController,
-            selectedTask = selectedTask,
-            selectedGoal = selectedGoal,
-            onSelectionComplete = { task, goal ->
-                selectedTask = task
-                selectedGoal = goal
-            }
+            selectedItems = selectedItems,
+            isGoals = isGoals
         )
     }
 }
@@ -135,7 +138,7 @@ fun ChallengeCard(title: String, subtitle: String, progress: String) {
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_calendar),
-            contentDescription = "Note Icon",
+            contentDescription = "Challenge Icon",
             modifier = Modifier.size(dimensionResource(id = R.dimen.icon_with_label_icon_size))
         )
         Column {
@@ -175,12 +178,9 @@ fun NoteCard(note: String) {
 @Composable
 fun GoalsGrid(
     navController: NavController,
-    selectedTask: String,
-    selectedGoal: String,
-    onSelectionComplete: (String, String) -> Unit
+    selectedItems: List<String>,
+    isGoals: List<Boolean>
 ) {
-    val goals = listOf("+", "+", "+")
-
     val buttonBackgroundColor = colorResource(id = R.color.primary)
 
     LazyVerticalGrid(
@@ -190,8 +190,8 @@ fun GoalsGrid(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium))
     ) {
-        items(goals) { goal ->
-            if (selectedTask.isNotEmpty() && selectedGoal.isNotEmpty()) {
+        items(3) { index ->
+            if (selectedItems[index].isNotEmpty()) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = buttonBackgroundColor,
@@ -209,14 +209,14 @@ fun GoalsGrid(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Task: $selectedTask",
+                            text = if (isGoals[index]) "Ziel:" else "Aufgabe:",
                             style = MaterialTheme.typography.bodySmall,
                             fontSize = 10.sp,
                             textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Goal: $selectedGoal",
+                            text = selectedItems[index],
                             style = MaterialTheme.typography.bodySmall,
                             fontSize = 10.sp,
                             textAlign = TextAlign.Center
@@ -237,7 +237,7 @@ fun GoalsGrid(
                     )
                 ) {
                     Text(
-                        text = goal,
+                        text = "+",
                         style = MaterialTheme.typography.bodySmall,
                         fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
                         textAlign = TextAlign.Center
@@ -245,16 +245,5 @@ fun GoalsGrid(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    GoalificationAppTheme {
-        HomepageScreen(
-            modifier = Modifier.fillMaxSize(),
-            navController = rememberNavController()
-        )
     }
 }
