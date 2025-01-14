@@ -34,6 +34,7 @@ import com.example.stats.StatsScreen
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.goalificationapp.Screens.GoalificationScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,7 +127,12 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                                 buttonIndex = buttonIndex
                             )
                         }
-
+                        composable("Goalification") {
+                            GoalificationScreen(
+                                navController = navController,
+                                viewModel = viewModel()
+                            )
+                        }
                     }
                 }
             )

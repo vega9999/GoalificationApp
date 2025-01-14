@@ -26,19 +26,32 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 class HomepageViewModel : ViewModel() {
-    private val _selectedItems = mutableStateListOf<String>("", "", "")
+    private val _selectedItems = mutableStateListOf<String>("", "", "", "", "", "", "", "", "")
     val selectedItems: List<String> = _selectedItems
 
-    private val _isGoals = mutableStateListOf<Boolean>(false, false, false)
+    private val _isGoals = mutableStateListOf<Boolean>(false, false, false, false, false, false, false, false, false)
     val isGoals: List<Boolean> = _isGoals
+
+    private val _waitingForApproval = mutableStateListOf<Boolean>(false, false, false, false, false, false, false, false, false)
+    val waitingForApproval: List<Boolean> = _waitingForApproval
+
+    private val _showBackground = mutableStateListOf<Boolean>(false, false, false, false, false, false, false, false, false)
+    val showBackground: List<Boolean> = _showBackground
 
     fun updateItem(index: Int, item: String, isGoal: Boolean) {
         _selectedItems[index] = item
         _isGoals[index] = isGoal
     }
+
+    fun toggleWaitingForApproval(index: Int) {
+        _waitingForApproval[index] = !_waitingForApproval[index]
+    }
+
+    fun toggleShowBackground(index: Int) {
+        _showBackground[index] = !_showBackground[index]
+    }
 }
 
-@SuppressLint("ResourceAsColor")
 @Composable
 fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: HomepageViewModel = viewModel()) {
     val selectedItems by remember { mutableStateOf(viewModel.selectedItems) }
@@ -105,6 +118,15 @@ fun HomepageScreen(modifier: Modifier = Modifier, navController: NavController, 
             selectedItems = selectedItems,
             isGoals = isGoals
         )
+
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.margin_large)))
+
+        Button(
+            onClick = { navController.navigate("Goalification") },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Go to Goalification")
+        }
     }
 }
 
@@ -204,7 +226,7 @@ fun GoalsGrid(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.margin_medium))
     ) {
-        items(3) { index ->
+        items(9) { index ->
             if (selectedItems[index].isNotEmpty()) {
                 Card(
                     colors = CardDefaults.cardColors(
