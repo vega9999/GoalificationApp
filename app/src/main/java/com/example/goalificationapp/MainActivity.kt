@@ -34,11 +34,16 @@ import com.example.stats.StatsScreen
 import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.goalificationapp.Screens.EmailLoginScreen
+import com.example.goalificationapp.Screens.ForgotPasswordScreen
 import com.example.goalificationapp.Screens.GoalificationScreen
+import com.example.goalificationapp.Screens.RegistrationScreen
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             GoalificationAppTheme {
                 MainScreen()
@@ -58,7 +63,7 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
     val isLoggedIn = viewModel.isLoggedIn.collectAsState(initial = false)
 
     if (!isLoggedIn.value) {
-        LoginScreen(viewModel = viewModel)
+        LoginScreen(viewModel = viewModel, navController)
     } else {
         ModalNavigationDrawer(
             drawerContent = {
@@ -100,6 +105,18 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                         navController = navController,
                         startDestination = "Homepage"
                     ) {
+                        composable("login") {
+                            LoginScreen(viewModel = viewModel, navController = navController)
+                        }
+                        composable("email_login") {
+                            EmailLoginScreen(viewModel = viewModel, navController = navController)
+                        }
+                        composable("email_registration") {
+                            RegistrationScreen(viewModel = viewModel, navController = navController)
+                        }
+                        composable("forgot_password") {
+                            ForgotPasswordScreen(viewModel = viewModel, navController = navController)
+                        }
                         composable("Homepage") {
                             HomepageScreen(
                                 modifier = Modifier.padding(paddingValues),
