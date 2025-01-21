@@ -1,6 +1,7 @@
 package com.example.goalificationapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import com.example.goalificationapp.Screens.EmailLoginScreen
 import com.example.goalificationapp.Screens.ForgotPasswordScreen
 import com.example.goalificationapp.Screens.GoalificationScreen
 import com.example.goalificationapp.Screens.RegistrationScreen
+import com.example.goalificationapp.Screens.WorkScreen
 import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
@@ -52,109 +54,185 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: LoginViewModel = viewModel()) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val currentScreen = remember { mutableStateOf("Homepage") }
     val username = viewModel.username.collectAsState(initial = null)
     val isLoggedIn = viewModel.isLoggedIn.collectAsState(initial = false)
 
-    if (!isLoggedIn.value) {
-        LoginScreen(viewModel = viewModel, navController)
-    } else {
-        ModalNavigationDrawer(
-            drawerContent = {
-                ModalDrawerSheet {
-                    DrawerContent(
-                        username = username.value ?: "Guest",
-                        onMenuItemClick = { selectedScreen ->
-                            currentScreen.value = selectedScreen
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate(selectedScreen)
-                            }
-                        },
-                        onLogoutClick = {
-                            viewModel.logout()
+    val startDestination = if (isLoggedIn.value) "Homepage" else "login"
+
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent(
+                    username = username.value ?: "Guest",
+                    onMenuItemClick = { selectedScreen ->
+                        scope.launch {
+                            drawerState.close()
+                            navController.navigate(selectedScreen)
                         }
+                    },
+                    onLogoutClick = {
+                        scope.launch {
+                            drawerState.close()
+                            viewModel.logout()
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+                )
+            }
+        },
+        drawerState = drawerState
+    ) {
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            modifier = Modifier
+        ) {
+            composable("login") {
+                LoginScreen(viewModel = viewModel, navController = navController)
+            }
+            composable("email_login") {
+                EmailLoginScreen(viewModel = viewModel, navController = navController)
+            }
+            composable("email_registration") {
+                RegistrationScreen(viewModel = viewModel, navController = navController)
+            }
+            composable("forgot_password") {
+                ForgotPasswordScreen(viewModel = viewModel, navController = navController)
+            }
+
+            // Main app screens
+            composable("Homepage") {
+                ScreenWithDrawer(
+                    title = "Homepage",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    HomepageScreen(
+                        modifier = Modifier.padding(paddingValues),
+                        navController = navController
                     )
                 }
-            },
-            drawerState = drawerState
-        ) {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text(text = stringResource(id = R.string.app_name)) },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    scope.launch { drawerState.open() }
-                                }
-                            ) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menu Icon")
-                            }
-                        }
+            }
+            composable("Calendar") {
+                ScreenWithDrawer(
+                    title = "Calendar",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    CalendarScreen(modifier = Modifier.padding(paddingValues))
+                }
+            }
+            composable("Stats") {
+                ScreenWithDrawer(
+                    title = "Stats",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    StatsScreen(modifier = Modifier.padding(paddingValues))
+                }
+            }
+            composable("Work") {
+                ScreenWithDrawer(
+                    title = "Work",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    WorkScreen(
+                        modifier = Modifier.padding(paddingValues),
+                        navController = navController
                     )
-                },
-                content = { paddingValues ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = "Homepage"
+                }
+            }
+            composable("Friends") {
+                ScreenWithDrawer(
+                    title = "Friends",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    Box(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxSize()
                     ) {
-                        composable("login") {
-                            LoginScreen(viewModel = viewModel, navController = navController)
-                        }
-                        composable("email_login") {
-                            EmailLoginScreen(viewModel = viewModel, navController = navController)
-                        }
-                        composable("email_registration") {
-                            RegistrationScreen(viewModel = viewModel, navController = navController)
-                        }
-                        composable("forgot_password") {
-                            ForgotPasswordScreen(viewModel = viewModel, navController = navController)
-                        }
-                        composable("Homepage") {
-                            HomepageScreen(
-                                modifier = Modifier.padding(paddingValues),
-                                navController = navController
-                            )
-                        }
-                        composable("Calendar") {
-                            CalendarScreen(
-                                modifier = Modifier.padding(paddingValues)
-                            )
-                        }
-                        composable("Stats") {
-                            StatsScreen(
-                                modifier = Modifier.padding(paddingValues)
-                            )
-                        }
-                        composable(
-                            route = "SelectGoalsTasksScreen/{buttonIndex}",
-                            arguments = listOf(navArgument("buttonIndex") { type = NavType.IntType })
-                        ) { backStackEntry ->
-                            val buttonIndex = backStackEntry.arguments?.getInt("buttonIndex") ?: 0
-                            SelectGoalsTasksScreen(
-                                modifier = Modifier.padding(paddingValues),
-                                navController = navController,
-                                buttonIndex = buttonIndex
-                            )
-                        }
-                        composable("Goalification") {
-                            GoalificationScreen(
-                                navController = navController,
-                                viewModel = viewModel()
-                            )
-                        }
+                        Text(
+                            text = "Friends Screen Coming Soon",
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+            composable("Freetime") {
+                ScreenWithDrawer(
+                    title = "Freetime",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    Box(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxSize()
+                    ) {
+                        Text(
+                            text = "Freetime Screen Coming Soon",
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+            composable("Goalification") {
+                ScreenWithDrawer(
+                    title = "Goalification",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    GoalificationScreen(
+                        modifier = Modifier.padding(paddingValues),
+                        navController = navController,
+                        viewModel = viewModel()
+                    )
+                }
+            }
+            composable(
+                route = "SelectGoalsTasksScreen/{buttonIndex}",
+                arguments = listOf(navArgument("buttonIndex") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val buttonIndex = backStackEntry.arguments?.getInt("buttonIndex") ?: 0
+                ScreenWithDrawer(
+                    title = "Select Goals & Tasks",
+                    drawerState = drawerState
+                ) { paddingValues ->
+                    SelectGoalsTasksScreen(
+                        modifier = Modifier.padding(paddingValues),
+                        navController = navController,
+                        buttonIndex = buttonIndex
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScreenWithDrawer(
+    title: String,
+    drawerState: DrawerState,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(title) },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu Icon")
                     }
                 }
             )
-        }
-    }
+        },
+        content = content
+    )
 }
 
 @Composable

@@ -33,12 +33,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val sharedPreferences = application.getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
 
     init {
-        // Check if user is already logged in
         val savedUsername = sharedPreferences.getString("username", null)
         if (savedUsername != null) {
             _username.value = savedUsername
             _isLoggedIn.value = true
         }
+    }
+
+    fun updateUsername(newUsername: String) {
+        _username.value = newUsername
+        sharedPreferences.edit().putString("username", newUsername).apply()
     }
 
     fun loginWithEmail(email: String, password: String) {
@@ -47,12 +51,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
                 val user = result.user
                 if (user != null) {
-                    _username.value = user.email
+                    val username = user.displayName ?: "Unknown User"
+                    _username.value = username
                     _isLoggedIn.value = true
-                    saveLoginState(user.email ?: "Unknown")
+                    saveLoginState(username)
                 }
             } catch (e: Exception) {
-                // Fehlerbehandlung, z.B. durch Anzeigen einer Nachricht
                 println("Login fehlgeschlagen: ${e.message}")
             }
         }
@@ -64,18 +68,14 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
                 val user = result.user
                 if (user != null) {
-                    user.updateProfile(
-                        userProfileChangeRequest {
-                            displayName = username
-                        }
-                    ).await()
-
+                    val profileUpdates = userProfileChangeRequest {
+                        displayName = username
+                    }
+                    user.updateProfile(profileUpdates).await()
                     _username.value = username
                     _isLoggedIn.value = true
-                    saveLoginState(username)
                 }
             } catch (e: Exception) {
-                // Fehlerbehandlung, z.B. durch Anzeigen einer Nachricht
                 println("Registrierung fehlgeschlagen: ${e.message}")
             }
         }

@@ -49,7 +49,11 @@ fun CalendarScreen(
 
     val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = currentWeekday)
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
         CalendarHeader(
             currentDate = currentDate.value,
             onMonthChange = { newDate ->
@@ -131,24 +135,6 @@ fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_right),
                 contentDescription = "Next Month"
-            )
-        }
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        val daysOfWeek = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        daysOfWeek.forEach { day ->
-            Text(
-                text = day,
-                modifier = Modifier.weight(1f),
-                fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
-                color = colorResource(id = R.color.secondary_text),
-                textAlign = TextAlign.Center
             )
         }
     }

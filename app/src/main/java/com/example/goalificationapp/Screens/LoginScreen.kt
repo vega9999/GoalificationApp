@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,13 +19,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,16 +42,25 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
 
     if (isLoggedIn) {
-        navController.navigate("main_screen")
-        return
+        LaunchedEffect(Unit) {
+            navController.navigate("Homepage") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
     }
 
     val annotatedText = buildAnnotatedString {
         append("Use Goalcut without registering: ")
         val startIndex = length
-        append("This way")
+        append("Here")
         addStyle(
-            style = SpanStyle(color = colorResource(R.color.primary)),
+            style = SpanStyle(
+                color = colorResource(R.color.primary),
+                shadow = Shadow(
+                    color = Color.Black,
+                    offset = Offset(2f, 2f),
+                    blurRadius = 0f
+                )),
             start = startIndex,
             end = length
         )
@@ -167,7 +181,7 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
                     end = offset
                 ).firstOrNull()?.let {
                     viewModel.useWithoutRegistering()
-                    navController.navigate("main_screen")
+                    navController.navigate("Homepage")
                 }
             },
             style = TextStyle(fontSize = 16.sp, color = Color.Black)
@@ -179,58 +193,114 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
 fun EmailLoginScreen(viewModel: LoginViewModel, navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Login",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                viewModel.loginWithEmail(email, password)
-                navController.navigate("main_screen")
-            },
-            modifier = Modifier.fillMaxWidth()
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.TopStart)
         ) {
-            Text("Login")
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back"
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextButton(
-            onClick = { navController.navigate("forgot_password") }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(top = 64.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Forgot password?")
+            Text(
+                text = "Login",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = colorResource(id = R.color.bg_color),
+                    focusedContainerColor = colorResource(id = R.color.bg_color),
+                    focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedTextColor = Color.Gray,
+                    focusedLabelColor = Color.Black
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = colorResource(id = R.color.bg_color),
+                    focusedContainerColor = colorResource(id = R.color.bg_color),
+                    focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedTextColor = Color.Gray,
+                    focusedLabelColor = Color.Black
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    val visibilityIcon = if (passwordVisible)
+                        painterResource(id = R.drawable.baseline_visibility_24)
+                    else
+                        painterResource(id = R.drawable.baseline_visibility_off_24)
+
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            painter = visibilityIcon,
+                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        )
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    viewModel.loginWithEmail(email, password)
+                    navController.navigate("Homepage")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
+            ) {
+                Text("Login", color = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(
+                onClick = { navController.navigate("forgot_password") }
+            ) {
+                Text(
+                    text = "Forgot password?",
+                    color = colorResource(id = R.color.primary),
+                    style = TextStyle(
+                        shadow = Shadow(
+                            color = Color.Black,
+                            offset = Offset(2f, 2f),
+                            blurRadius = 0f
+                        )
+                    )
+                )
+            }
         }
     }
 }
-

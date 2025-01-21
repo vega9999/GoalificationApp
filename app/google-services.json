@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "360571359685",
+    "project_id": "goalificationapp",
+    "storage_bucket": "goalificationapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360571359685:android:094fab438f65cc71ed7bac",
+        "android_client_info": {
+          "package_name": "com.example.goalificationapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNiLiBR0VO5ADid5Vn75XBUr-XoUoT8Q4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
