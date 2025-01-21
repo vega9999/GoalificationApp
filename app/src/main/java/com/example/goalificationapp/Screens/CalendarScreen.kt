@@ -134,14 +134,6 @@ fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
             )
         }
     }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-    }
 }
 
 @SuppressLint("NewApi")
