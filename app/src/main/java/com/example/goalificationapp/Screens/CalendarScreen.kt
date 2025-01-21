@@ -141,16 +141,6 @@ fun CalendarHeader(currentDate: LocalDate, onMonthChange: (LocalDate) -> Unit) {
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val daysOfWeek = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        daysOfWeek.forEach { day ->
-            Text(
-                text = day,
-                modifier = Modifier.weight(1f),
-                fontSize = dimensionResource(id = R.dimen.text_regular).value.sp,
-                color = colorResource(id = R.color.secondary_text),
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }
 
