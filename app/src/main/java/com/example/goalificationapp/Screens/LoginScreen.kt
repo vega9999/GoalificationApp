@@ -32,10 +32,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.goalificationapp.R
 import com.example.goalificationapp.ui.theme.LoginViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
@@ -194,6 +196,7 @@ fun EmailLoginScreen(viewModel: LoginViewModel, navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -234,6 +237,7 @@ fun EmailLoginScreen(viewModel: LoginViewModel, navController: NavController) {
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),
@@ -252,6 +256,7 @@ fun EmailLoginScreen(viewModel: LoginViewModel, navController: NavController) {
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),
@@ -275,8 +280,14 @@ fun EmailLoginScreen(viewModel: LoginViewModel, navController: NavController) {
 
             Button(
                 onClick = {
-                    viewModel.loginWithEmail(email, password)
-                    navController.navigate("Homepage")
+                    viewModel.viewModelScope.launch {
+                        val success = viewModel.tryLoginWithEmail(email, password)
+                        if (success) {
+                            navController.navigate("Homepage")
+                        } else {
+                            isError = true
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary))
@@ -285,6 +296,15 @@ fun EmailLoginScreen(viewModel: LoginViewModel, navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if (isError) {
+                Text(
+                    text = "Wrong E-Mail or Password",
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
 
             TextButton(
                 onClick = { navController.navigate("forgot_password") }

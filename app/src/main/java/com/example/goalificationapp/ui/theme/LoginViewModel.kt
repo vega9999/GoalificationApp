@@ -93,6 +93,24 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    suspend fun tryLoginWithEmail(email: String, password: String): Boolean {
+        return try {
+            val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            val user = result.user
+            if (user != null) {
+                val username = user.displayName ?: "Unknown User"
+                _username.value = username
+                _isLoggedIn.value = true
+                saveLoginState(username)
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     /*
     fun logout() {
         viewModelScope.launch {
