@@ -19,19 +19,19 @@ import androidx.navigation.NavController
 @Composable
 fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController, buttonIndex: Int) {
     val tasks = listOf(
-        "Müllsammelaktion in Parks organisieren",
-        "Gemeinschaftsgarten pflegen",
-        "Blutspendeveranstaltung unterstützen",
-        "Suppenküche für Bedürftige betreuen",
-        "Bäume pflanzen für ein Umweltprojekt"
+        "Organize litter collection campaigns in parks",
+        "Maintain a community garden",
+        "Support blood donation events",
+        "Run a soup kitchen for the needy",
+        "Plant trees for an environmental project"
     )
 
     val goals = listOf(
-        "10 Stunden pro Monat Freiwilligenarbeit leisten",
-        "An 5 verschiedenen Projekten teilnehmen",
-        "100 kg Müll sammeln und recyceln",
-        "20 Bäume in einem Monat pflanzen",
-        "5 neue Freiwillige für das Projekt gewinnen"
+        "Volunteer 10 hours per month",
+        "Participate in 5 different projects",
+        "Collect and recycle 100 kg of waste",
+        "Plant 20 trees in one month",
+        "Recruit 5 new volunteers for the project"
     )
 
     var selectedItem by remember { mutableStateOf("") }
@@ -45,14 +45,14 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController, but
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Wähle eine Aufgabe oder ein Ziel",
+            text = "Choose a task or a goal",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
         Text(
-            text = "Aufgaben",
+            text = "Task",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
@@ -69,7 +69,7 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController, but
         }
 
         Text(
-            text = "Ziele",
+            text = "Goal",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
@@ -104,7 +104,7 @@ fun SelectGoalsTasksScreen(modifier: Modifier, navController: NavController, but
             },
             enabled = selectedItem.isNotEmpty()
         ) {
-            Text("Auswahl bestätigen")
+            Text("Confirm selection")
         }
     }
 }
