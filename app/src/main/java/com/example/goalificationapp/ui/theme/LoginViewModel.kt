@@ -32,6 +32,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
     private val sharedPreferences = application.getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
 
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> get() = _errorMessage
     init {
         val savedUsername = sharedPreferences.getString("username", null)
         if (savedUsername != null) {
@@ -62,9 +64,19 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun setErrorMessage(message: String) {
+        _errorMessage.value = message
+    }
+
     fun registerWithEmail(email: String, username: String, password: String) {
         viewModelScope.launch {
             try {
+                val existingMethods = firebaseAuth.fetchSignInMethodsForEmail(email).await()
+                if (existingMethods.signInMethods?.isNotEmpty() == true) {
+                    _errorMessage.value = "Username or E-Mail already in use"
+                    return@launch
+                }
+
                 val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
                 val user = result.user
                 if (user != null) {
@@ -76,7 +88,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                     _isLoggedIn.value = true
                 }
             } catch (e: Exception) {
-                println("Registrierung fehlgeschlagen: ${e.message}")
+                setErrorMessage("An error occurred: ${e.message}")
             }
         }
     }
@@ -110,16 +122,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             false
         }
     }
-
-    /*
-    fun logout() {
-        viewModelScope.launch {
-            _username.value = null
-            _isLoggedIn.value = false
-            clearLoginState()
-        }
-    }
-     */
 
     fun sendPasswordResetEmail(email: String) {
         // TODO: Implement actual password reset logic

@@ -245,7 +245,7 @@ fun GoalsGrid(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = if (isGoals[index]) "Ziel:" else "Aufgabe:",
+                            text = if (isGoals[index]) "Goal:" else "Task:",
                             style = MaterialTheme.typography.bodySmall,
                             fontSize = 10.sp,
                             textAlign = TextAlign.Center

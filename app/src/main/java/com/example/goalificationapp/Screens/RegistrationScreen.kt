@@ -32,6 +32,9 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
     var confirmPassword by remember { mutableStateOf("") }
     var password1Visible by remember { mutableStateOf(false) }
     var password2Visible by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
+
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -70,6 +73,7 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),
@@ -86,6 +90,7 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),
@@ -104,6 +109,7 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),
@@ -135,6 +141,7 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),
@@ -154,6 +161,15 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
                 }
             )
 
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
@@ -163,7 +179,7 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
                         viewModel.updateUsername(username)
                         navController.navigate("Homepage")
                     } else {
-                        // Show error message
+                        viewModel.setErrorMessage("Wrong password")
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -196,6 +212,7 @@ fun RegistrationScreen(viewModel: LoginViewModel, navController: NavController) 
 @Composable
 fun ForgotPasswordScreen(viewModel: LoginViewModel, navController: NavController) {
     var email by remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -234,6 +251,7 @@ fun ForgotPasswordScreen(viewModel: LoginViewModel, navController: NavController
                     unfocusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedContainerColor = colorResource(id = R.color.bg_color),
                     focusedIndicatorColor = colorResource(id = R.color.primary),
+                    unfocusedIndicatorColor = if (isError) Color.Red else Color.Gray,
                     unfocusedTextColor = Color.Gray,
                     focusedLabelColor = Color.Black
                 ),

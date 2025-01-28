@@ -1,7 +1,6 @@
 
 package com.example.goalificationapp.Screens
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,16 +29,10 @@ fun GoalificationScreen(
     viewModel: HomepageViewModel
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
-        Text(
-            text = "Goals",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier.weight(1f),

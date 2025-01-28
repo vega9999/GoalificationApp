@@ -1,7 +1,6 @@
 package com.example.goalificationapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -20,8 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,8 +40,8 @@ import com.example.goalificationapp.Screens.EmailLoginScreen
 import com.example.goalificationapp.Screens.ForgotPasswordScreen
 import com.example.goalificationapp.Screens.GoalificationScreen
 import com.example.goalificationapp.Screens.RegistrationScreen
-import com.example.goalificationapp.Screens.WorkScreen
 import com.google.firebase.FirebaseApp
+import java.util.prefs.Preferences
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,10 +141,16 @@ fun MainScreen(viewModel: LoginViewModel = viewModel()) {
                     title = "Work",
                     drawerState = drawerState
                 ) { paddingValues ->
-                    WorkScreen(
-                        modifier = Modifier.padding(paddingValues),
-                        navController = navController
-                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                            .fillMaxSize()
+                    ) {
+                        Text(
+                            text = "Work Screen Coming Soon",
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
                 }
             }
             composable("Friends") {
